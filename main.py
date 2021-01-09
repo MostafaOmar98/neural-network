@@ -2,7 +2,7 @@ import math
 import numpy as np
 from Data_Wrapper import Data
 from NeuralNetwork import NeuralNetwork
-
+from matplotlib import pyplot as plt
 # WARNING: It's better to download the ./assets/train.txt from the assignment page since it seem to have problems with crlf thingy on git
 
 def sigmoid(x):
@@ -17,7 +17,21 @@ def sigmoidDeriv(x):
     return x * (1 - x)
 
 if __name__ == '__main__':
+    '''
+    test from lab (OK)
+        myW = [np.array([0]), np.array([[0.3, -0.9, 1], [-1.2, 1, 1]]), np.array([[1, 0.8]])]
+        nn = NeuralNetwork([3, 2, 1], sigmoid, sigmoidDeriv, myW)
+        x = np.array([1, 0, 1])
+        y = np.array([0])
+        nn.forward(x)
+        # print(nn.a)
+        print(nn.backward(y, 0.3))
+        print()
+        print()
+        print(nn.w)
+    '''
     data = Data("./assets/train.txt")
-
     nn = NeuralNetwork(data.structure, sigmoid, sigmoidDeriv)
-    nn.learn(data.data, 1000, 0.01)
+    nn.learn(data.data, 500, 0.3)
+    plt.plot(nn.errors)
+    plt.show()

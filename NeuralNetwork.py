@@ -19,6 +19,7 @@ class NeuralNetwork:
             self.randInitWeights()
         else:
             self.w = w
+        self.errors = []
 
     def networkShapedMatrix(self):
         return [np.zeros(shape=length, dtype=np.float64) for length in self.n]
@@ -29,10 +30,21 @@ class NeuralNetwork:
 
     def learn(self, ds: DataSet, EPOCHS: int, alpha: float):
         self.randInitWeights()
+        self.errors.append(self.MSE(ds))
         for i in range(EPOCHS):
             for [x, y] in ds:
                 self.forward(x)
                 self.backward(y, alpha)
+            self.errors.append(self.MSE(ds))
+            print("Error at iteration " + str(i) + " = " + str(self.errors[-1]))
+
+    def MSE(self, ds):
+        total = 0
+        for [x, y] in ds:
+            self.forward(x)
+            total += np.sum((self.a[-1] - y)**2)
+        total /= ds.m
+        return total
 
     def forward(self, x: np.ndarray):
         '''
@@ -53,8 +65,8 @@ class NeuralNetwork:
         '''
         d = self.networkShapedMatrix()
         d[-1] = (self.a[-1] - y) * self.fDeriv_v(self.a[-1])
-        for h in range (self.L - 2, -1, -1):
-            d[h] = np.matmul(self.w[h+1].transpose(), d[h + 1]) * self.fDeriv_v(self.a[h])
+        for h in range (self.L - 2, 0, -1):
+            d[h] = np.matmul(self.w[h + 1].transpose(), d[h + 1]) * self.fDeriv_v(self.a[h])
             '''
             explanation of above line:
             np.matmul(...) will return an array of same size as d[h]. each element of the array is resultant from the dot product d[h + 1] array with each column of self.w[h + 1]
@@ -65,7 +77,7 @@ class NeuralNetwork:
 
         for h in range(1, self.L):
             self.w[h] -= alpha * self.makeMat(d[h], self.a[h - 1])
-
+        return d
 
     def makeMat(self, v1: np.ndarray, v2: np.ndarray):
         return np.matmul(v1.reshape((v1.shape[0], 1)), v2.reshape((1, v2.shape[0])))
