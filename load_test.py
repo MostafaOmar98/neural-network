@@ -17,12 +17,12 @@ if __name__ == '__main__':
     s = str(input("Enter test file path or enter x to use \"" + test_path + "\": "))
     if (s != "x"):
         test_path = s
-    print(test_path)
+    print("Using test path: " + test_path)
     data = Data(test_path, normFeatures, normLabels)
     nn = NeuralNetwork(data.structure, conf.sigmoid, conf.sigmoidDeriv, w)
-    print(nn.MSE(data.data))
+    print("MSE On test data = " + str(nn.MSE(data.data)))
     while(True):
-        s = str(input("Do you want to test one more example [y/n]?"))
+        s = str(input("Do you want to test one more example [y/n]: "))
         if (s == "n"):
             break
         inp = [1]

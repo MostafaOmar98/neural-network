@@ -2,7 +2,7 @@ import math
 
 TRAIN_PATH = './assets/train.txt'
 PARAMS_PATH = './assets/params.pkl'
-TEST_PATH = './assets/train.txt'
+TEST_PATH = './assets/test.txt'
 
 def sigmoid(x):
   return 1 / (1 + math.exp(-x))
