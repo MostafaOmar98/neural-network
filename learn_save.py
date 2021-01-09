@@ -1,22 +1,12 @@
 import math
 import numpy as np
+import conf
 from Data_Wrapper import Data
 from NeuralNetwork import NeuralNetwork
 from matplotlib import pyplot as plt
 import pickle
+
 # WARNING: It's better to download the ./assets/train.txt from the assignment page since it seem to have problems with crlf thingy on git
-
-def sigmoid(x):
-  return 1 / (1 + math.exp(-x))
-
-def sigmoidDeriv(x):
-    '''
-
-    :param x: value that has already been sigmoided
-    :return: derivative of sigmoid function has it been applied on x before sigmoiding it
-    '''
-    return x * (1 - x)
-
 if __name__ == '__main__':
     '''
     test from lab (OK)
@@ -31,12 +21,17 @@ if __name__ == '__main__':
         print()
         print(nn.w)
     '''
-    data = Data("./assets/train.txt")
-    nn = NeuralNetwork(data.structure, sigmoid, sigmoidDeriv)
+    data = Data(conf.TRAIN_PATH)
+    nn = NeuralNetwork(data.structure, conf.sigmoid, conf.sigmoidDeriv)
     epochs = int(input("Epochs: "))
     alpha = float(input("Learning rate: "))
     nn.learn(data.data, epochs, alpha)
     plt.plot(nn.errors)
     plt.show()
-    with open('./assets/weights.txt', 'wb') as outfile:
-        pickle.dump(nn.w, outfile, pickle.HIGHEST_PROTOCOL)
+
+    params = [nn.w, [data.data.normFeatures, data.data.normLabels]]
+
+    with open(conf.PARAMS_PATH, 'wb') as outfile:
+        pickle.dump(params, outfile, pickle.HIGHEST_PROTOCOL)
+
+    print(nn.w)
