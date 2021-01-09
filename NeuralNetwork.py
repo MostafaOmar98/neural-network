@@ -8,42 +8,72 @@ class NeuralNetwork:
         '''
         constructor
         :param structure: size of each layer, structure[0] is input layer size (including bias), and structure[-1] is output layer size
+        :param f: activation function
+        :param fDeriv: activation function derivative. it should take f(x) as an input and returns derivative of f(x) as output
+        :param w: weight matrix
         '''
         self.n = structure
-        self.L = len(structure)
-        self.a = self.networkShapedMatrix()
-        self.f_v = np.vectorize(f)
+        self.L = len(structure) # Number of layers
+        self.a = self.networkShapedMatrix() # a[i][j] is the value of jth node in the ith layer
+        self.f_v = np.vectorize(f) # vectorizing f to apply it to a vector instead of just a scalar
         self.fDeriv = fDeriv
-        self.fDeriv_v = np.vectorize(fDeriv)
+        self.fDeriv_v = np.vectorize(fDeriv) # vectorizing fDeriv
         if (w == None):
             self.randInitWeights()
         else:
             self.w = w
-        self.errors = []
+        self.errors = [] # for logging of cost
 
     def networkShapedMatrix(self):
+        '''
+
+        :return: 2D Matrix. mat[i][j] is the jth node in the ith layer.
+        '''
         return [np.zeros(shape=length, dtype=np.float64) for length in self.n]
 
     def randInitWeights(self):
+        '''
+        initializes all weight matrices [1, L) randomly with values in range [0, 1)
+        :return: void
+        '''
         self.w = [np.zeros(1)] + [np.random.rand(self.n[l], self.n[l - 1]) for l in range(1, self.L)]
         # self.w = [np.zeros(1)] + [np.ones(shape=(self.n[l], self.n[l - 1])) for l in range(1, self.L)]
 
     def learn(self, ds: DataSet, EPOCHS: int, alpha: float):
-        self.randInitWeights()
-        self.errors.append(self.MSE(ds))
+        '''
+        learns weight w on dataset ds
+        :param ds: training set
+        :param EPOCHS: number of epochs to train on
+        :param alpha: learning rate
+        :return:
+        '''
+        self.errors.append(self.averageMSE(ds))
         for i in range(EPOCHS):
             for [x, y] in ds:
                 self.forward(x)
                 self.backward(y, alpha)
-            self.errors.append(self.MSE(ds))
+            self.errors.append(self.averageMSE(ds))
             print("Error at iteration " + str(i) + " = " + str(self.errors[-1]))
 
-    def MSE(self, ds):
+    def SE(self, y_pred, y_actual):
+        '''
+
+        :param y_pred: predicted output vector
+        :param y_actual: actual output vector
+        :return: summation of squared pairwise difference of elements of both vectors
+        '''
+        return np.sum((y_pred - y_actual)**2)
+
+    def averageMSE(self, ds):
+        '''
+        Mean square error
+        :param ds:
+        :return:
+        '''
         total = 0
         for [x, y] in ds:
-            self.forward(x)
-            total += np.sum((self.a[-1] - y)**2)
-        total /= ds.m
+            total += self.SE(self.forward(x), y)
+        total /= 2 * ds.m
         return total
 
     def forward(self, x: np.ndarray):
@@ -52,7 +82,7 @@ class NeuralNetwork:
         :param x: 1D input feature vector of size self.n[0]
         :return: 1D output vector of size self.n[-1]
         '''
-        self.a[0] = np.copy(x)
+        self.a[0] = x
         for i in range (1, self.L):
             self.a[i] = self.f_v(np.matmul(self.w[i], self.a[i - 1]))
         return self.a[-1]
@@ -61,7 +91,7 @@ class NeuralNetwork:
         '''
         updated weights on w
         :param y: 1D output vector of size self.n[-1]
-        :return: void
+        :return: delta matrix
         '''
         d = self.networkShapedMatrix()
         d[-1] = (self.a[-1] - y) * self.fDeriv_v(self.a[-1])
@@ -80,4 +110,10 @@ class NeuralNetwork:
         return d
 
     def makeMat(self, v1: np.ndarray, v2: np.ndarray):
+        '''
+        generates matrix out of product of v1, v2
+        :param v1: 1D np array
+        :param v2: 1D np array
+        :return: matrix where mat[i][j] is v1[i] * v2[j]
+        '''
         return np.matmul(v1.reshape((v1.shape[0], 1)), v2.reshape((1, v2.shape[0])))
