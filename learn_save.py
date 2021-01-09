@@ -3,6 +3,7 @@ import numpy as np
 from Data_Wrapper import Data
 from NeuralNetwork import NeuralNetwork
 from matplotlib import pyplot as plt
+import pickle
 # WARNING: It's better to download the ./assets/train.txt from the assignment page since it seem to have problems with crlf thingy on git
 
 def sigmoid(x):
@@ -32,6 +33,10 @@ if __name__ == '__main__':
     '''
     data = Data("./assets/train.txt")
     nn = NeuralNetwork(data.structure, sigmoid, sigmoidDeriv)
-    nn.learn(data.data, 500, 0.3)
+    epochs = int(input("Epochs: "))
+    alpha = float(input("Learning rate: "))
+    nn.learn(data.data, epochs, alpha)
     plt.plot(nn.errors)
     plt.show()
+    with open('./assets/weights.txt', 'wb') as outfile:
+        pickle.dump(nn.w, outfile, pickle.HIGHEST_PROTOCOL)
