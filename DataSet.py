@@ -48,6 +48,11 @@ class DataSet:
         self.normLabels = self.calcNormSingular(self.labels)
 
     def calcNormSingular(self, v):
+        '''
+
+        :param v: nd array. each row is a vector (representing features or labels)
+        :return: mean/standard deviation of all rows of each feature or label.
+        '''
         mean = np.mean(v, axis=0)
         std = np.std(v, axis=0)
         return [mean, std]
