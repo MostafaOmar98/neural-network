@@ -9,7 +9,12 @@ def sigmoid(x):
   return 1 / (1 + math.exp(-x))
 
 def sigmoidDeriv(x):
-    return sigmoid(x) * (1 - sigmoid(x))
+    '''
+
+    :param x: value that has already been sigmoided
+    :return: derivative of sigmoid function has it been applied on x before sigmoiding it
+    '''
+    return x * (1 - x)
 
 if __name__ == '__main__':
     data = Data("./assets/train.txt")
