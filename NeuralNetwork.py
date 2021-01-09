@@ -27,13 +27,12 @@ class NeuralNetwork:
         self.w = [np.zeros(1)] + [np.random.rand(self.n[l], self.n[l - 1]) for l in range(1, self.L)]
         # self.w = [np.zeros(1)] + [np.ones(shape=(self.n[l], self.n[l - 1])) for l in range(1, self.L)]
 
-    def learn(self, ds: DataSet, EPOCHS: int):
+    def learn(self, ds: DataSet, EPOCHS: int, alpha: float):
         self.randInitWeights()
-        for i in range(1):
+        for i in range(EPOCHS):
             for [x, y] in ds:
                 self.forward(x)
-                self.backward(y)
-                break
+                self.backward(y, alpha)
 
     def forward(self, x: np.ndarray):
         '''
@@ -46,7 +45,7 @@ class NeuralNetwork:
             self.a[i] = self.f_v(np.matmul(self.w[i], self.a[i - 1]))
         return self.a[-1]
 
-    def backward(self, y: np.ndarray):
+    def backward(self, y: np.ndarray, alpha):
         '''
         updated weights on w
         :param y: 1D output vector of size self.n[-1]
@@ -65,4 +64,8 @@ class NeuralNetwork:
             #     d[h][j] = np.sum(d[h + 1] * self.w[h + 1][:, j]) * self.fDeriv(self.a[h][j])
 
         for h in range(1, self.L):
-            pass
+            self.w[h] -= alpha * self.makeMat(d[h], self.a[h - 1])
+
+
+    def makeMat(self, v1: np.ndarray, v2: np.ndarray):
+        return np.matmul(v1.reshape((v1.shape[0], 1)), v2.reshape((1, v2.shape[0])))

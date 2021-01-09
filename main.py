@@ -1,5 +1,5 @@
 import math
-
+import numpy as np
 from Data_Wrapper import Data
 from NeuralNetwork import NeuralNetwork
 
@@ -20,4 +20,4 @@ if __name__ == '__main__':
     data = Data("./assets/train.txt")
 
     nn = NeuralNetwork(data.structure, sigmoid, sigmoidDeriv)
-    nn.learn(data.data, 1000)
+    nn.learn(data.data, 1000, 0.01)
