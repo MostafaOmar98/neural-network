@@ -47,12 +47,12 @@ class NeuralNetwork:
         :param alpha: learning rate
         :return:
         '''
-        self.errors.append(self.averageMSE(ds))
+        self.errors.append(self.MSE(ds))
         for i in range(EPOCHS):
             for [x, y] in ds:
                 self.forward(x)
                 self.backward(y, alpha)
-            self.errors.append(self.averageMSE(ds))
+            self.errors.append(self.MSE(ds))
             print("Error at iteration " + str(i) + " = " + str(self.errors[-1]))
 
     def SE(self, y_pred, y_actual):
@@ -64,7 +64,7 @@ class NeuralNetwork:
         '''
         return np.sum((y_pred - y_actual)**2)
 
-    def averageMSE(self, ds):
+    def MSE(self, ds):
         '''
         Mean square error
         :param ds:

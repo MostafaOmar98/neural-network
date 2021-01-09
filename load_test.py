@@ -20,7 +20,7 @@ if __name__ == '__main__':
     print(test_path)
     data = Data(test_path, normFeatures, normLabels)
     nn = NeuralNetwork(data.structure, conf.sigmoid, conf.sigmoidDeriv, w)
-    print(nn.averageMSE(data.data))
+    print(nn.MSE(data.data))
     while(True):
         s = str(input("Do you want to test one more example [y/n]?"))
         if (s == "n"):
